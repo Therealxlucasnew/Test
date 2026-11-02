@@ -1,0 +1,15 @@
+{
+  "audioDurationSec": 56.72,
+  "hasVoiceover": false,
+  "segments": [
+    {"scene": "hook", "text": "Imagine spending four months making a movie.. that was never real. And everyone around you was in on it."},
+    {"scene": "who", "text": "That's what happened to Danish comedian Rasmus Wallbridge."},
+    {"scene": "film", "text": "He thought he was developing a film with his friend, Martin Johannes Larsen. Hidden cameras filmed him the whole time."},
+    {"scene": "show", "text": "TV 2 turned it into a show called Alle elsker Rasmus. That means, Everyone Loves Rasmus."},
+    {"scene": "backlash", "text": "It came out on October 26th, and people instantly called it bullying."},
+    {"scene": "minister", "text": "Even Denmark's culture minister said TV 2 broke its own guidelines."},
+    {"scene": "pulled", "text": "Five days later, TV 2 pulled the show from every platform, and gave him an unconditional apology."},
+    {"scene": "after", "text": "TV 2 says Rasmus got the final say on whether it aired. He's barely spoken since. He just asked them never to make a show like this again."},
+    {"scene": "cta", "text": "So.. harmless prank, or did TV 2 go way too far? Tell me what you think in the comments."}
+  ]
+}
