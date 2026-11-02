@@ -15,7 +15,7 @@ out.mkdir(parents=True, exist_ok=True)
 here = Path(__file__).parent
 script = json.loads((here / "script.json").read_text())
 
-VOICE, SPEED, SR = "am_michael", 1.18, 24000
+VOICE, SPEED, SR = "af_heart", 1.2, 24000
 PHRASE_GAP, SCENE_GAP, LEAD_IN = 0.09, 0.14, 0.25
 kokoro = Kokoro(model, voices)
 
@@ -35,7 +35,7 @@ for scene in script:
         idx = np.where(np.abs(samples) > 0.012)[0]
         samples = samples[max(idx[0] - 240, 0): min(idx[-1] + 960, len(samples))]
         dur = len(samples) / SR
-        words = shown.split()
+        words = shown.split(" ")  # plain spaces only, so "TV\u00a02" stays one caption word
         weights = [len(re.sub(r"[^\w]", "", w)) + 1.5 for w in words]
         # numerals are spoken much longer than they are written ("149" = "one hundred and forty-nine")
         weights = [wgt * 3 if re.search(r"\d", w) else wgt for w, wgt in zip(words, weights)]

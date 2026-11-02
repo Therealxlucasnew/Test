@@ -31,6 +31,8 @@
     background: radial-gradient(ellipse at 50% 45%, rgba(0,0,0,0) 45%, rgba(0,0,0,.75) 100%); }
   #flash { position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; }
 
+  /* TikTok crops ~95px per side on tall phones: keep all graphics inside a scaled safe area */
+  #safe { position: absolute; inset: 0; transform: scale(.84); transform-origin: 540px 800px; }
   .scene { position: absolute; inset: 0; opacity: 0; transform-origin: 540px 760px; }
   .el { position: absolute; left: 540px; top: 0; transform: translate(-50%, -50%); white-space: nowrap; text-align: center; will-change: transform, opacity; }
   .black { font-weight: 900; letter-spacing: -0.03em; line-height: .9; text-transform: uppercase; }
@@ -43,8 +45,8 @@
   .shadow { text-shadow: 0 18px 60px rgba(0,0,0,.55); }
 
   /* Captions */
-  #captions { position: absolute; left: 90px; right: 90px; top: 1250px; height: 240px; display: flex; flex-wrap: wrap; justify-content: center; align-content: center; gap: 4px 22px; }
-  #captions span { display: inline-block; font-weight: 900; font-size: 74px; text-transform: uppercase; letter-spacing: -0.01em; line-height: 1.05;
+  #captions { position: absolute; left: 130px; right: 130px; top: 1250px; height: 240px; display: flex; flex-wrap: wrap; justify-content: center; align-content: center; gap: 4px 22px; }
+  #captions span { display: inline-block; font-weight: 900; font-size: 70px; text-transform: uppercase; letter-spacing: -0.01em; line-height: 1.05;
     text-shadow: 0 0 2px #000, 4px 4px 0 #000, -4px 4px 0 #000, 4px -4px 0 #000, -4px -4px 0 #000, 0 6px 0 #000, 0 10px 30px rgba(0,0,0,.8);
     transform-origin: 50% 70%; }
 
@@ -59,7 +61,7 @@
 <div id="stage">
   <div id="world">
     <div class="bg" id="bg"><div id="blobA"></div><div id="blobB"></div><div id="blobC"></div><div id="grid"></div></div>
-    <div id="scenes"></div>
+    <div id="safe"><div id="scenes"></div></div>
     <div id="captions"></div>
   </div>
   <canvas id="grain" width="1080" height="1920"></canvas>
@@ -223,7 +225,7 @@ DEF.film = (S, $) => {
   $.dream = el(S, 'his dream', 770, 'black', 'font-size:176px;background:linear-gradient(180deg,#fff6c2 0%,#ffd60a 45%,#ff9f0a 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 40px rgba(255,214,10,.45));padding:0 20px');
   $.sparks = [[150, 560, 90], [930, 600, 70], [220, 980, 60], [880, 960, 100], [540, 470, 50], [80, 800, 44], [1000, 790, 52]].map(([x, y, sz], i) => { const e = el(S, ICON.spark(sz), y, '', `left:${x}px`); e.i = i; return e; });
   $.movie = el(S, 'The movie', 830, 'black', 'font-size:170px');
-  $.parody = el(S, `${ICON.ghost(54)}<span>Danish “Scary Movie”-style parody</span>`, 965, 'xbold', 'font-size:50px;display:flex;align-items:center;gap:16px;color:var(--yellow)');
+  $.parody = el(S, `${ICON.ghost(54)}<span>Danish “Scary Movie”-style parody</span>`, 965, 'xbold', 'font-size:44px;display:flex;align-items:center;gap:16px;color:var(--yellow)');
   $.friend = el(S, `<div style="font-size:34px;letter-spacing:.2em;color:var(--muted);font-weight:700">WITH HIS FRIEND</div><div style="font-size:66px;margin-top:6px">MARTIN JOHANNES LARSEN</div>`, 1120, 'xbold',
     'padding:22px 44px;border-radius:28px;background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.2)');
   const tDream = word('film', 0, /living/), tMovie = p(1).s, tClap = tMovie + .42;
@@ -440,7 +442,7 @@ DEF.backlash = (S, $) => {
   $.l1 = el(S, 'Comedians & TV hosts:', 450, 'xbold', 'font-size:52px;color:var(--muted)');
   $.c1 = el(S, 'Bullying', 610, 'stamp', 'font-size:180px;background:var(--red)');
   $.l2 = el(S, 'One critic:', 830, 'xbold', 'font-size:52px;color:var(--muted)');
-  $.c2 = el(S, 'Psychological<br>torture', 1030, 'stamp', 'font-size:126px;background:var(--yellow);color:#000');
+  $.c2 = el(S, 'Psychological<br>torture', 1030, 'stamp', 'font-size:104px;background:var(--yellow);color:#000');
   const tB = word('backlash', 1, /bully/), tT = p(3).s;
   S.cfg = { slams: [[tB, 1], [tT, 1]], pops: [p(0).s, p(2).s] };
   return (t) => {
