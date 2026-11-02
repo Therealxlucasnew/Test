@@ -1,0 +1,98 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      background: var(--color-ink);
+    }
+    #s8-flash {
+      position: absolute;
+      inset: 0;
+      background: var(--color-orange);
+      opacity: 0;
+    }
+    .s8-copy {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1920px;
+      height: 1080px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: 400px;
+      line-height: 1;
+      letter-spacing: -0.03em;
+      white-space: nowrap;
+    }
+    #s8-r { color: #ff5a1f; mix-blend-mode: screen; }
+    #s8-b { color: #2340ff; mix-blend-mode: screen; }
+    .s8-slice { color: var(--color-bone); }
+    #s8-word { opacity: 0; }
+  </style>
+  <div id="root" data-composition-id="s8" data-width="1920" data-height="1080">
+    <div id="s8-flash"></div>
+    <div id="s8-word">
+      <div data-layout-allow-overlap class="s8-copy" id="s8-r">GLITCH</div>
+      <div data-layout-allow-overlap class="s8-copy" id="s8-b">GLITCH</div>
+      <div data-layout-allow-overlap class="s8-copy s8-slice" id="s8-s0">GLITCH</div>
+      <div data-layout-allow-overlap class="s8-copy s8-slice" id="s8-s1">GLITCH</div>
+      <div data-layout-allow-overlap class="s8-copy s8-slice" id="s8-s2">GLITCH</div>
+      <div data-layout-allow-overlap class="s8-copy s8-slice" id="s8-s3">GLITCH</div>
+      <div data-layout-allow-overlap class="s8-copy s8-slice" id="s8-s4">GLITCH</div>
+      <div data-layout-allow-overlap class="s8-copy s8-slice" id="s8-s5">GLITCH</div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      function mulberry32(a) {
+        return function () {
+          a |= 0; a = (a + 0x6d2b79f5) | 0;
+          let t = Math.imul(a ^ (a >>> 15), 1 | a);
+          t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+          return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+      }
+      const rnd = mulberry32(42);
+      const F = 1 / 30;
+      const bands = [[360, 430], [430, 500], [500, 560], [560, 620], [620, 690], [690, 760]];
+      bands.forEach((b, i) => {
+        gsap.set("#s8-s" + i, { clipPath: "inset(" + b[0] + "px 0px " + (1080 - b[1]) + "px 0px)" });
+      });
+      const tl = gsap.timeline({ paused: true });
+      tl.set("#s8-word", { opacity: 1 }, 0.25);
+
+      function glitchFrame(t, k) {
+        for (let i = 0; i < 6; i++) {
+          const on = rnd() < 0.6;
+          tl.set("#s8-s" + i, { x: on ? (rnd() - 0.5) * 260 * k : 0 }, t);
+        }
+        tl.set("#s8-r", { x: -(10 + rnd() * 40) * k, y: (rnd() - 0.5) * 16 * k }, t);
+        tl.set("#s8-b", { x: (10 + rnd() * 40) * k, y: (rnd() - 0.5) * 16 * k }, t);
+      }
+      function calm(t) {
+        for (let i = 0; i < 6; i++) tl.set("#s8-s" + i, { x: 0 }, t);
+        tl.set("#s8-r", { x: -8, y: 0 }, t);
+        tl.set("#s8-b", { x: 8, y: 0 }, t);
+      }
+      // Burst 1 as the word arrives, burst 2 on "weird", then the tear-out.
+      for (let f = 0; f < 12; f += 2) glitchFrame(0.25 + f * F, 1);
+      calm(0.25 + 12 * F);
+      for (let f = 0; f < 10; f += 2) glitchFrame(1.2 + f * F, 1.4);
+      calm(1.2 + 10 * F);
+      for (let f = 0; f < 10; f += 1) glitchFrame(1.95 + f * F, 1 + f * 0.6);
+      tl.set("#s8-word", { opacity: 0 }, 2.33);
+
+      // The ground flickers on four single frames.
+      [[0.3, "#FF5A1F"], [0.43, "#2340FF"], [1.27, "#FF5A1F"], [2.1, "#2340FF"]].forEach(([t, c]) => {
+        tl.set("#s8-flash", { opacity: 1, backgroundColor: c }, t);
+        tl.set("#s8-flash", { opacity: 0 }, t + F);
+      });
+      // End on a solid ink frame for the cut into the tiles.
+      tl.set("#s8-flash", { opacity: 0 }, 2.36);
+      window.__timelines["s8"] = tl;
+    })();
+  </script>
+</template>

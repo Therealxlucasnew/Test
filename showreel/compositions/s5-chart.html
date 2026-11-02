@@ -1,0 +1,109 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      background: var(--color-bone);
+    }
+    #s5-count {
+      position: absolute;
+      left: 150px;
+      top: 150px;
+      font-family: var(--font-display);
+      font-size: 300px;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      color: var(--color-ink);
+    }
+    #s5-label {
+      position: absolute;
+      left: 160px;
+      top: 470px;
+      font-family: var(--font-body);
+      font-weight: 700;
+      font-size: 56px;
+      letter-spacing: -0.01em;
+      color: var(--color-ink);
+    }
+    .s5-bar {
+      position: absolute;
+      bottom: 200px;
+      width: 100px;
+      background: var(--color-ink);
+      transform-origin: 50% 100%;
+    }
+    #s5-axis {
+      position: absolute;
+      left: 590px;
+      top: 880px;
+      width: 1190px;
+      height: 8px;
+      background: var(--color-ink);
+      transform-origin: 0 50%;
+    }
+    #s5-svg {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1920px;
+      height: 1080px;
+    }
+    #s5-dot {
+      position: absolute;
+      width: 56px;
+      height: 56px;
+      margin: -28px 0 0 -28px;
+      border-radius: 50%;
+      background: var(--color-ink);
+    }
+  </style>
+  <div id="root" data-composition-id="s5" data-width="1920" data-height="1080">
+    <div id="s5-count">0</div>
+    <div id="s5-label">plays this week</div>
+    <div id="s5-axis"></div>
+    <div id="s5-bars"></div>
+    <svg id="s5-svg" viewBox="0 0 1920 1080">
+      <path id="s5-line" fill="none" stroke="#FF5A1F" stroke-width="12" stroke-linejoin="round" stroke-linecap="round" />
+    </svg>
+    <div id="s5-dot"></div>
+  </div>
+  <script>
+    (function () {
+      const H = [180, 260, 220, 340, 300, 420, 560, 470];
+      const X0 = 610, W = 100, GAP = 50, BASE = 880;
+      const barsHost = document.getElementById("s5-bars");
+      const pts = [];
+      H.forEach((h, i) => {
+        const b = document.createElement("div");
+        b.className = "s5-bar";
+        b.id = "s5-bar" + i;
+        b.style.left = X0 + i * (W + GAP) + "px";
+        b.style.height = h + "px";
+        if (i === 6) b.style.background = "#FF5A1F";
+        barsHost.appendChild(b);
+        pts.push([X0 + i * (W + GAP) + W / 2, BASE - h - 60]);
+      });
+      const line = document.getElementById("s5-line");
+      line.setAttribute("d", "M " + pts.map((p) => p.join(" ")).join(" L "));
+      const last = pts[pts.length - 1];
+      const dot = document.getElementById("s5-dot");
+      dot.style.left = last[0] + "px";
+      dot.style.top = last[1] + "px";
+
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo("#s5-axis", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "expo.out" }, 0.25);
+      tl.fromTo(".s5-bar", { scaleY: 0 }, { scaleY: 1, duration: 0.6, ease: "expo.out", stagger: 0.08 }, 0.5);
+      const c = { v: 0 };
+      const countEl = document.getElementById("s5-count");
+      tl.fromTo(c, { v: 0 }, { v: 128, duration: 1.1, ease: "power2.out",
+        onUpdate: () => { countEl.textContent = Math.round(c.v); } }, 0.55);
+      tl.fromTo("#s5-label", { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.18 }, 0.9);
+      tl.fromTo(line, { strokeDasharray: 1600, strokeDashoffset: 1600 }, { strokeDashoffset: 0, duration: 0.8, ease: "power2.inOut" }, 1.3);
+      tl.fromTo("#s5-dot", { scale: 0 }, { scale: 1, duration: 0.3, ease: "back.out(2)" }, 2.05);
+      // The last point becomes the world: the dot opens into the ink globe scene.
+      tl.to("#s5-dot", { scale: 90, duration: 0.6, ease: "power3.in" }, 2.75);
+      window.__timelines["s5"] = tl;
+    })();
+  </script>
+</template>

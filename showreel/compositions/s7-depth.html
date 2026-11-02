@@ -1,0 +1,67 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      background: var(--color-blue);
+      perspective: 1500px;
+      perspective-origin: 50% 50%;
+    }
+    #s7-word {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1920px;
+      height: 1080px;
+      transform-style: preserve-3d;
+    }
+    .s7-layer {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1920px;
+      height: 1080px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: 400px;
+      line-height: 1;
+      letter-spacing: -0.03em;
+      white-space: nowrap;
+    }
+  </style>
+  <div id="root" data-composition-id="s7" data-width="1920" data-height="1080">
+    <div id="s7-word"></div>
+  </div>
+  <script>
+    (function () {
+      const host = document.getElementById("s7-word");
+      const N = 28, STEP = 5;
+      // Extrusion: back layers darken from orange to burnt; the face is bone.
+      const mix = (a, b, t) => Math.round(a + (b - a) * t);
+      const layers = [];
+      for (let i = N - 1; i >= 0; i--) {
+        const d = document.createElement("div");
+        d.className = "s7-layer";
+        d.setAttribute("data-layout-allow-overlap", "");
+        d.textContent = "DEPTH";
+        const t = i / (N - 1);
+        d.style.color = i === 0 ? "#EEE8DC" : "rgb(" + mix(255, 120, t) + "," + mix(90, 34, t) + "," + mix(31, 10, t) + ")";
+        host.appendChild(d);
+        layers.push([d, i]);
+      }
+      layers.forEach(([d, i]) => gsap.set(d, { z: -i * STEP }));
+
+      const tl = gsap.timeline({ paused: true });
+      // Swing so the light runs across the depth.
+      tl.fromTo(host, { rotationY: -48, rotationX: 28, scale: 0.7, z: -400 },
+        { rotationY: -18, rotationX: 12, scale: 1, z: 0, duration: 0.7, ease: "expo.out" }, 0.1);
+      tl.to(host, { rotationY: 30, rotationX: -14, duration: 1.7, ease: "power2.inOut" }, 0.8);
+      // "steps right off the screen": the word flies at the camera.
+      tl.to(host, { z: 1450, rotationY: 6, rotationX: 0, duration: 0.6, ease: "power3.in" }, 2.5);
+      window.__timelines["s7"] = tl;
+    })();
+  </script>
+</template>

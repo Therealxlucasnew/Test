@@ -1,0 +1,109 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      background: var(--color-orange);
+    }
+    #s10-count {
+      position: absolute;
+      left: 160px;
+      top: 70px;
+      display: flex;
+      font-family: var(--font-display);
+      font-size: 170px;
+      line-height: 1;
+      color: var(--color-ink);
+    }
+    #s10-count span {
+      display: inline-block;
+      width: 128px;
+      text-align: center;
+    }
+    #s10-label {
+      position: absolute;
+      left: 700px;
+      top: 118px;
+      font-family: var(--font-body);
+      font-weight: 700;
+      font-size: 60px;
+      letter-spacing: -0.01em;
+      color: var(--color-ink);
+    }
+    #s10-strip {
+      position: absolute;
+      left: 0;
+      top: 350px;
+      height: 480px;
+      width: 7200px;
+      background-color: var(--color-ink);
+      background-image:
+        repeating-linear-gradient(90deg, #eee8dc 0 34px, transparent 34px 70px),
+        repeating-linear-gradient(90deg, #eee8dc 0 34px, transparent 34px 70px);
+      background-size: 100% 26px, 100% 26px;
+      background-position: 0 22px, 0 432px;
+      background-repeat: no-repeat;
+    }
+    .s10-f {
+      position: absolute;
+      top: 80px;
+      width: 520px;
+      height: 320px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      line-height: 1;
+      letter-spacing: -0.03em;
+      white-space: nowrap;
+    }
+    #s10-cover {
+      position: absolute;
+      inset: 0;
+      background: var(--color-bone);
+      opacity: 0;
+    }
+  </style>
+  <div id="root" data-composition-id="s10" data-width="1920" data-height="1080">
+    <div id="s10-strip" data-layout-allow-overflow>
+      <div class="s10-f" style="left:40px;background:#FF5A1F;color:#141414;font-size:150px">WORD</div>
+      <div class="s10-f" style="left:600px;background:#141414;color:#EEE8DC;font-size:130px;text-decoration:line-through;text-decoration-color:#FF5A1F;text-decoration-thickness:16px">pop</div>
+      <div class="s10-f" style="left:1160px;background:#FF5A1F"><svg width="520" height="320" viewBox="0 0 520 320"><path d="M 40 160 C 110 40, 150 40, 200 160 S 290 280, 340 160 S 430 40, 480 160" fill="none" stroke="#141414" stroke-width="16" stroke-linecap="round"/></svg></div>
+      <div class="s10-f" style="left:1720px;background:#2340FF;color:#EEE8DC;font-size:170px">TYPE</div>
+      <div class="s10-f" style="left:2280px;background:#EEE8DC"><svg width="520" height="320" viewBox="0 0 520 320"><rect x="80" y="190" width="50" height="80" fill="#141414"/><rect x="160" y="150" width="50" height="120" fill="#141414"/><rect x="240" y="110" width="50" height="160" fill="#141414"/><rect x="320" y="50" width="50" height="220" fill="#FF5A1F"/><rect x="400" y="90" width="50" height="180" fill="#141414"/></svg></div>
+      <div class="s10-f" style="left:2840px;background:#141414"><svg width="520" height="320" viewBox="0 0 520 320"><circle cx="260" cy="160" r="120" fill="#EEE8DC"/><path d="M 170 120 Q 260 30 350 130" fill="none" stroke="#FF5A1F" stroke-width="10" stroke-linecap="round"/></svg></div>
+      <div class="s10-f" style="left:3400px;background:#2340FF;color:#FF5A1F;font-size:140px;text-shadow:6px 6px 0 #a33a12,12px 12px 0 #78220a">DEPTH</div>
+      <div class="s10-f" style="left:3960px;background:#141414;color:#EEE8DC;font-size:120px;text-shadow:-10px 0 0 #FF5A1F,10px 0 0 #2340FF">GLITCH</div>
+      <div class="s10-f" style="left:4520px;background:#141414"><svg width="520" height="320" viewBox="0 0 520 320"><rect x="0" y="0" width="173" height="160" fill="#FF5A1F"/><rect x="173" y="0" width="174" height="160" fill="#EEE8DC"/><rect x="347" y="0" width="173" height="160" fill="#141414"/><rect x="0" y="160" width="173" height="160" fill="#2340FF"/><rect x="173" y="160" width="174" height="160" fill="#141414"/><rect x="347" y="160" width="173" height="160" fill="#EEE8DC"/></svg></div>
+      <div class="s10-f" style="left:5080px;background:#EEE8DC;color:#141414;font-size:200px">Aa</div>
+      <div class="s10-f" style="left:5640px;background:#141414;color:#FF5A1F;font-size:200px">3D</div>
+      <div class="s10-f" id="s10-last" style="left:6200px;background:#EEE8DC;color:#141414;font-size:130px">Claude</div>
+    </div>
+    <div id="s10-count"><span id="s10-d0">0</span><span id="s10-d1">0</span><span id="s10-d2">0</span><span id="s10-d3">0</span></div>
+    <div id="s10-label">frames, one at a time</div>
+    <div id="s10-cover"></div>
+  </div>
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      // Strip runs left and settles with the last frame centred: 6200 + 260 -> 960.
+      const END_X = 960 - (6200 + 260);
+      const st = { p: 0 };
+      const digits = [0, 1, 2, 3].map((i) => document.getElementById("s10-d" + i));
+      function count() {
+        const n = String(Math.round(st.p * 1200)).padStart(4, "0");
+        for (let i = 0; i < 4; i++) digits[i].textContent = n[i];
+      }
+      count();
+      tl.fromTo("#s10-strip", { x: 300 }, { x: END_X, duration: 2.5, ease: "power4.inOut" }, 0.05);
+      tl.fromTo(st, { p: 0 }, { p: 1, duration: 2.5, ease: "power4.inOut", onUpdate: count }, 0.05);
+      tl.fromTo("#s10-label", { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.18 }, 0.4);
+      // The last frame becomes the world: bone floods out of it.
+      tl.set("#s10-cover", { opacity: 1 }, 2.95);
+      tl.fromTo("#s10-cover", { clipPath: "inset(430px 700px 330px 700px)" }, { clipPath: "inset(0px 0px 0px 0px)", duration: 0.5, ease: "power3.in" }, 2.95);
+      window.__timelines["s10"] = tl;
+    })();
+  </script>
+</template>

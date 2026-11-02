@@ -1,0 +1,97 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      background: var(--color-ink);
+    }
+    #s6-cam {
+      position: absolute;
+      inset: 0;
+    }
+    #s6-svg {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1920px;
+      height: 1080px;
+    }
+    #s6-iris {
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      margin: -30px 0 0 -30px;
+      border-radius: 50%;
+      background: var(--color-blue);
+      opacity: 0;
+    }
+  </style>
+  <div id="root" data-composition-id="s6" data-width="1920" data-height="1080">
+    <div id="s6-cam">
+      <svg id="s6-svg" viewBox="0 0 1920 1080">
+        <circle id="s6-ocean" cx="960" cy="560" r="470" fill="#202020" />
+        <path id="s6-grat" fill="none" stroke="#EEE8DC" stroke-opacity="0.18" stroke-width="1.5" />
+        <path id="s6-land" fill="#EEE8DC" />
+        <path id="s6-arc" fill="none" stroke="#FF5A1F" stroke-width="9" stroke-linecap="round" />
+        <circle id="s6-from" r="14" fill="#FF5A1F" />
+        <circle id="s6-to" r="14" fill="#2340FF" stroke="#EEE8DC" stroke-width="5" />
+        <path id="s6-plane" d="M 22 0 L -14 -13 L -7 0 L -14 13 Z" fill="#FF5A1F" />
+      </svg>
+      <div id="s6-iris"></div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const CX = 960, CY = 560, R = 470;
+      const FROM = [139.7, 35.7]; // Tokyo
+      const TO = [-122.4, 37.8]; // San Francisco
+      const proj = d3.geoOrthographic().scale(R).translate([CX, CY]).clipAngle(90);
+      const path = d3.geoPath(proj);
+      const grat = d3.geoGraticule10();
+      const land = window.SR_LAND;
+      const interp = d3.geoInterpolate(FROM, TO);
+      const el = (id) => document.getElementById(id);
+      const st = { lon: -150, lat: -20, p: 0 };
+      const tAt = (u) => interp(Math.max(0, Math.min(1, u)));
+
+      function draw() {
+        proj.rotate([-st.lon, -st.lat, 0]);
+        el("s6-grat").setAttribute("d", path(grat) || "");
+        el("s6-land").setAttribute("d", path(land) || "");
+        const n = 64, coords = [];
+        for (let i = 0; i <= n; i++) coords.push(tAt((i / n) * st.p));
+        el("s6-arc").setAttribute("d", st.p > 0.001 ? path({ type: "LineString", coordinates: coords }) || "" : "");
+        const a = proj(FROM), b = proj(TO);
+        el("s6-from").setAttribute("cx", a[0]); el("s6-from").setAttribute("cy", a[1]);
+        el("s6-to").setAttribute("cx", b[0]); el("s6-to").setAttribute("cy", b[1]);
+        const head = proj(tAt(st.p)), ahead = proj(tAt(st.p + 0.01));
+        const ang = Math.atan2(ahead[1] - head[1], ahead[0] - head[0]) * 180 / Math.PI;
+        el("s6-plane").setAttribute("transform", "translate(" + head[0].toFixed(1) + " " + head[1].toFixed(1) + ") rotate(" + ang.toFixed(1) + ")");
+        el("s6-plane").setAttribute("opacity", st.p > 0.02 && st.p < 0.995 ? 1 : 0);
+      }
+      draw();
+
+      // Landing point position in screen space at the final rotation, for the camera and the iris.
+      const END = { lon: -165, lat: 30 };
+      proj.rotate([-END.lon, -END.lat, 0]);
+      const land0 = proj(TO);
+      proj.rotate([-st.lon, -st.lat, 0]);
+      const iris = el("s6-iris");
+      iris.style.left = land0[0] + "px";
+      iris.style.top = land0[1] + "px";
+
+      const tl = gsap.timeline({ paused: true });
+      // The globe turns toward the route the whole time.
+      tl.fromTo(st, { lon: -150 + 120, lat: 10 }, { lon: END.lon, lat: END.lat, duration: 2.6, ease: "power2.inOut", onUpdate: draw }, 0);
+      tl.fromTo("#s6-cam", { scale: 0.86 }, { scale: 1, duration: 0.6, ease: "expo.out" }, 0);
+      // "we're already flying": the arc draws, the plane flies it.
+      tl.fromTo(st, { p: 0 }, { p: 1, duration: 1.6, ease: "power2.inOut", onUpdate: draw }, 0.55);
+      // Camera pushes to the landing point; the pin opens into the next world.
+      tl.to("#s6-cam", { scale: 2.2, x: (CX - land0[0]) * 2.2, y: (CY - land0[1]) * 2.2, duration: 0.7, ease: "power3.in", transformOrigin: CX + "px " + CY + "px" }, 2.3);
+      tl.set(iris, { opacity: 1 }, 2.55);
+      tl.fromTo(iris, { scale: 0.5 }, { scale: 60, duration: 0.55, ease: "power3.in" }, 2.55);
+      window.__timelines["s6"] = tl;
+    })();
+  </script>
+</template>
