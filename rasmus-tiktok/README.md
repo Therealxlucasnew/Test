@@ -1,6 +1,6 @@
 # "Everybody Loves Rasmus": TikTok explainer
 
-A ~58 second vertical (1080×1920, 30 fps) motion-graphics video in English
+A ~59 second vertical (1080×1920, 30 fps) motion-graphics video in English
 about the Danish TV 2 prank show *Alle elsker Rasmus* and the backlash that
 followed. It ends with the question "What's your opinion?"
 
@@ -12,8 +12,8 @@ followed. It ends with the question "What's your opinion?"
 |---|------|-----------|
 | 1 | Hook | Imagine this. For four months, everyone around you is lying to your face. And you have absolutely no idea. |
 | 2 | Who | Meet Danish comedian Rasmus Wallbridge. |
-| 3 | The setup | He thought he was making a movie, a Danish Scary Movie-style parody, with his friend Martin Johannes Larsen. |
-| 4 | The twist | But there was no movie. Martin was in on it, with a hidden camera in his lapel pin. |
+| 3 | The dream | He thought he was living his dream, making his own movie, a Danish Scary Movie-style parody, with his friend Martin Johannes Larsen. |
+| 4 | The twist | But the dream was fake. Martin was in on it, with a hidden camera in his lapel pin. |
 | 5 | Scale | 149 people were in on the joke. Friends. Colleagues. Even big Danish celebrities. |
 | 6 | The show | It was all for a TV 2 show called *Everybody Loves Rasmus* (*Alle elsker Rasmus*). |
 | 7 | Premiere | It premiered on October 26th, and Denmark exploded. |
@@ -41,7 +41,8 @@ music samples, so there are no rights issues.
 | `tts.py` | Generates the voiceover with [Kokoro](https://github.com/thewh1teagle/kokoro-onnx) (voice `af_heart`) and writes `timeline.json` with phrase and word timings |
 | `index.html` | The motion-graphics "stage": every scene is a pure function of time `render(t)`, with word-synced kinetic captions |
 | `render.cjs` | Steps through `render(t)` frame by frame in headless Chromium (Playwright) and pipes the frames to ffmpeg |
-| `audio.py` | Synthesizes a 124 BPM beat (drops on "four months"), whooshes, impacts, a riser into "Denmark exploded", then ducks it under the voice |
+| `audio.py` | Synthesizes a 124 BPM beat (drops on "four months"), whooshes, impacts, a dreamy chime, a riser plus boom and debris crackle on "Denmark exploded", then ducks it all under the voice |
+| `narration.txt` | The full voiceover as one block of text, ready to paste into ElevenLabs or any other TTS |
 
 ### Rebuild
 

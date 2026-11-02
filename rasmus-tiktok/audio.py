@@ -200,6 +200,27 @@ def beep():
     return np.sin(2 * np.pi * 1000 * np.arange(n) / SR) * np.minimum(1, (n - np.arange(n)) / 300) * np.minimum(1, np.arange(n) / 300)
 
 
+def chime():
+    """dreamy bell arpeggio (A major add9)"""
+    out = np.zeros(int(1.6 * SR))
+    for k, m in enumerate([81, 85, 88, 93, 95]):
+        n = int(1.2 * SR); t = np.arange(n) / SR; f = NOTE(m)
+        x = (np.sin(2 * np.pi * f * t) + .3 * np.sin(2 * np.pi * 2.01 * f * t)) * env(n, .003, .45)
+        put(out, x, k * .07)
+    return out
+
+
+def crackle(d=1.4):
+    """debris / firework crackle: sparse random clicks that thin out"""
+    n = int(d * SR); out = np.zeros(n)
+    for k in range(140):
+        u = rng.random() ** 2.2  # dense at the start
+        i = int(u * (n - 400))
+        c = filt(rng.standard_normal(300), "highpass", 2500) * env(300, .0003, .002) * (1 - u)
+        out[i:i + 300] += c
+    return out
+
+
 def glitch():
     n = int(.3 * SR); x = rng.standard_normal(n)
     x = np.repeat(x[::40], 40)[:n]  # sample-and-hold "bitcrush"
@@ -217,6 +238,8 @@ for e in sfx:
     elif ty == "clap": put(fx, clack(), t, .7)
     elif ty == "rec": put(fx, beep(), t, .16)
     elif ty == "glitch": put(fx, glitch(), t, .25)
+    elif ty == "crackle": put(fx, crackle(), t, .5)
+    elif ty == "chime": put(fx, chime(), t - .05, .35)
 
 put(fx, riser(t_explode - scene["premiere"]["start"]), scene["premiere"]["start"], .22)
 put(fx, impact(1.2), t_end - 1.0, .35)
