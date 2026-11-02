@@ -1,0 +1,15 @@
+[
+  {"id": "hook", "phrases": ["Imagine this.", "For four months,", "everyone around you", "is lying to your face."]},
+  {"id": "noidea", "phrases": ["And you have absolutely no idea."]},
+  {"id": "who", "phrases": ["Meet Danish comedian", "Rasmus Wallbridge."]},
+  {"id": "film", "phrases": ["He thought he was making a movie,", "a Danish Scary Movie-style parody,", "with his friend,", "Martin Johannes Larsen."]},
+  {"id": "nofilm", "phrases": ["But there was no movie.", "Martin was in on it,", "with a hidden camera", "in his lapel pin."]},
+  {"id": "people", "phrases": [{"say": "One hundred and forty-nine people", "show": "149 people"}, "were in on the joke.", "Friends.", "Colleagues.", "Even big Danish celebrities."]},
+  {"id": "show", "phrases": [{"say": "It was all for a TV two show called", "show": "It was all for a TV 2 show called"}, "Everybody Loves Rasmus."]},
+  {"id": "premiere", "phrases": [{"say": "It premiered on October twenty-sixth,", "show": "It premiered on October 26th,"}, "and Denmark exploded."]},
+  {"id": "backlash", "phrases": ["Comedians and TV hosts", "called it bullying.", "One critic called it", "psychological torture."]},
+  {"id": "pulled", "phrases": ["Within days,", {"say": "TV two pulled the entire show,", "show": "TV 2 pulled the entire show,"}, "and apologized unconditionally,", "admitting it failed to protect him."]},
+  {"id": "sorry", "phrases": ["Stars who took part", "are now saying sorry too.", "One said he should have known better,", "and said no."]},
+  {"id": "rasmus", "phrases": ["And Rasmus?", "He says he's not in a place", "to join the debate right now."]},
+  {"id": "cta", "phrases": ["So,", "harmless prank,", "or way too far?", "What's your opinion?"]}
+]
