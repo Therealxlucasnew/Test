@@ -1,0 +1,13 @@
+{
+  "extraKnownMarketplaces": {
+    "tiktok-skills": {
+      "source": {
+        "source": "directory",
+        "path": "./tiktok-skills"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "tiktok-skills@tiktok-skills": true
+  }
+}
