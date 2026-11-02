@@ -38,7 +38,7 @@ music samples, so there are no rights issues.
 | File | What it does |
 |------|--------------|
 | `script.json` | Voiceover text, split into scenes and phrases |
-| `tts.py` | Generates the voiceover with [Kokoro](https://github.com/thewh1teagle/kokoro-onnx) (voice `af_heart`) and writes `timeline.json` with phrase and word timings |
+| `tts.py` | Generates the voiceover with [Kokoro](https://github.com/thewh1teagle/kokoro-onnx) (voice `am_michael`, speed 1.18) and writes `timeline.json` with phrase and word timings |
 | `index.html` | The motion-graphics "stage": every scene is a pure function of time `render(t)`, with word-synced kinetic captions |
 | `render.cjs` | Steps through `render(t)` frame by frame in headless Chromium (Playwright) and pipes the frames to ffmpeg |
 | `audio.py` | Synthesizes a 124 BPM beat (drops on "four months"), whooshes, impacts, a dreamy chime, a riser plus boom and debris crackle on "Denmark exploded", then ducks it all under the voice |

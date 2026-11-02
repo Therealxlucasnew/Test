@@ -15,8 +15,8 @@ out.mkdir(parents=True, exist_ok=True)
 here = Path(__file__).parent
 script = json.loads((here / "script.json").read_text())
 
-VOICE, SPEED, SR = "af_heart", 1.22, 24000
-PHRASE_GAP, SCENE_GAP, LEAD_IN = 0.06, 0.16, 0.25
+VOICE, SPEED, SR = "am_michael", 1.18, 24000
+PHRASE_GAP, SCENE_GAP, LEAD_IN = 0.09, 0.14, 0.25
 kokoro = Kokoro(model, voices)
 
 audio = [np.zeros(int(LEAD_IN * SR), np.float32)]
@@ -28,8 +28,12 @@ for scene in script:
         # a phrase is either plain text or {"say": spoken text, "show": caption text}
         text = ph["say"] if isinstance(ph, dict) else ph
         shown = ph["show"] if isinstance(ph, dict) else ph
-        samples, sr = kokoro.create(text, voice=VOICE, speed=SPEED, lang="en-us")
+        samples, sr = kokoro.create(text, voice=VOICE, speed=SPEED, lang="en-us", trim=False)
         assert sr == SR
+        # trim silence ourselves: keep 10 ms before the first sound and 40 ms of tail,
+        # so word endings are not clipped (Kokoro's built-in trim can cut them)
+        idx = np.where(np.abs(samples) > 0.012)[0]
+        samples = samples[max(idx[0] - 240, 0): min(idx[-1] + 960, len(samples))]
         dur = len(samples) / SR
         words = shown.split()
         weights = [len(re.sub(r"[^\w]", "", w)) + 1.5 for w in words]
@@ -53,7 +57,8 @@ for scene in script:
 tail = 1.4  # let the CTA breathe at the end
 audio.append(np.zeros(int(tail * SR), np.float32))
 total = t + tail
-sf.write(out / "voice.wav", np.concatenate(audio), SR)
+v = np.concatenate(audio)
+sf.write(out / "voice.wav", v / np.abs(v).max() * 0.95, SR)
 (out / "timeline.json").write_text(json.dumps({"duration": round(total, 3), "scenes": timeline}, indent=1))
 print(f"duration {total:.2f}s")
 for s in timeline:
