@@ -101,7 +101,7 @@ def time_stretch(seg, factor):
     p = subprocess.run(["ffmpeg", "-v", "error", "-f", "f32le", "-ar", str(SR), "-ac", "1", "-i", "-",
                         "-af", f"atempo={factor:.3f}", "-f", "f32le", "-"], input=seg.astype(np.float32).tobytes(),
                        capture_output=True, check=True)
-    return np.frombuffer(p.stdout, dtype=np.float32)
+    return np.frombuffer(p.stdout, dtype=np.float32).copy()
 
 
 def word_times(words, t0, t1):
