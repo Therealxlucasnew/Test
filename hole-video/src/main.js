@@ -209,6 +209,7 @@ window.dbg = { scene, world, man, camera, renderer, THREE };
   const font = new FontFace("Anton", "url(/node_modules/@fontsource/anton/files/anton-latin-400-normal.woff2)");
   await font.load();
   document.fonts.add(font);
+  try { window.VO = await (await fetch("/vo/vo_timing.json")).json(); } catch (e) { window.VO = []; }
   window.renderAt(0);
   window.ready = true;
 })();

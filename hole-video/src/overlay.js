@@ -8,26 +8,8 @@ const CX = 525; // nudge left of center to stay clear of TikTok's right-side but
 
 // lines: array of lines; each line: array of [text, color]
 const caps = [
-  { t0: 0.05, t1: 1.45, y: 1180, size: 100, lines: [[["HE HAD NO IDEA", WHITE]], [["WHAT WAS UNDER", WHITE]], [["HIS FEET...", YEL]]], anim: "words" },
-  { t0: 1.5, t1: 2.8, y: 600, size: 170, lines: [[["BIG", WHITE]], [["MISTAKE.", RED]]], anim: "slam" },
-  { t0: 2.9, t1: 4.4, y: 560, size: 150, lines: [[["20 FEET", YEL]], [["STRAIGHT DOWN.", WHITE]]], anim: "slam" },
-  { t0: 4.45, t1: 5.5, y: 560, size: 110, lines: [[["NO ROPE.", WHITE]], [["NO LADDER.", WHITE]]], anim: "words" },
-  { t0: 5.58, t1: 6.38, y: 560, size: 120, lines: [[["HOW DOES HE", WHITE]], [["GET OUT?", YEL]]], anim: "pop" },
-  { t0: 13.65, t1: 14.3, y: 600, size: 120, lines: [[["IT'S WORKING?!", YEL]]], anim: "pop" },
   { t0: 14.34, t1: 15.15, y: 600, size: 190, lines: [[["*SNAP*", RED]]], anim: "shake" },
-  { t0: 17.85, t1: 18.55, y: 560, size: 130, lines: [[["NO SIGNAL.", RED]]], anim: "slam" },
-  { t0: 18.62, t1: 19.62, y: 560, size: 100, lines: [[["MAYBE UP", WHITE]], [["HERE?", YEL]]], anim: "pop" },
   { t0: 19.7, t1: 20.65, y: 600, size: 210, lines: [[["HELP!!!", WHITE]]], anim: "shake" },
-  { t0: 22.55, t1: 23.6, y: 560, size: 96, lines: [[["THEN HE HEARD", WHITE]], [["SOMETHING...", WHITE]]], anim: "words" },
-  { t0: 23.72, t1: 24.42, y: 580, size: 150, lines: [[["HE WAS", WHITE]], [["NOT ALONE.", RED]]], anim: "slam" },
-  { t0: 25.65, t1: 26.95, y: 560, size: 140, lines: [[["AND IT WAS", WHITE]], [["HUNGRY.", RED]]], anim: "slam" },
-  { t0: 27.05, t1: 27.75, y: 520, size: 100, lines: [[["THEN HE NOTICED", WHITE]], [["THE WALLS...", WHITE]]], anim: "words" },
-  { t0: 28.25, t1: 29.75, y: 520, size: 150, lines: [[["THE CHIMNEY", YEL]], [["CLIMB", YEL]]], sub: "PUSH BOTH WALLS. NEVER LET GO.", anim: "slam" },
-  { t0: 30.3, t1: 31.4, y: 560, size: 190, lines: [[["FASTER!!!", RED]]], anim: "shake" },
-  { t0: 31.5, t1: 32.9, y: 560, size: 110, lines: [[["DON'T", WHITE]], [["LOOK DOWN.", WHITE]]], anim: "pop" },
-  { t0: timing.T_DOWN + 0.05, t1: 36.55, y: 560, size: 150, lines: [[["HE MADE", WHITE]], [["IT.", YEL]]], anim: "slam" },
-  { t0: 37.0, t1: 38.05, y: 560, size: 110, lines: [[["...OR DID", WHITE]], [["HE?", WHITE]]], anim: "words" },
-  { t0: 38.15, t1: 39.45, y: 560, size: 130, lines: [[["IT'S STILL", WHITE]], [["DOWN THERE.", RED]]], anim: "slam" },
 ];
 
 const attempts = [
@@ -274,8 +256,63 @@ function endCard(ctx, t) {
   }
 }
 
+// ---- voiceover karaoke captions (timings from vo/vo_timing.json) ----
+const SUB_Y = 1250, SUB_SIZE = 100;
+const SUB_COL = { w: WHITE, y: YEL, r: RED };
+function chunksOf(line) {
+  const out = [];
+  let cur = [];
+  for (const w of line.words) {
+    cur.push(w);
+    if (cur.length >= 3 || /[.!?,:]$/.test(w.w)) { out.push(cur); cur = []; }
+  }
+  if (cur.length) out.push(cur);
+  return out;
+}
+function drawSubs(ctx, t, vo) {
+  for (let li = 0; li < vo.length; li++) {
+    const line = vo[li];
+    const nextStart = li + 1 < vo.length ? vo[li + 1].start - 0.05 : Infinity;
+    if (!line.sub || t < line.start - 0.05 || t > line.end + 0.45 || t >= nextStart) continue;
+    const chunks = chunksOf(line);
+    for (let k = 0; k < chunks.length; k++) {
+      const ch = chunks[k];
+      const c0 = ch[0].t0 - 0.04;
+      const c1 = k + 1 < chunks.length ? chunks[k + 1][0].t0 - 0.04 : line.end + 0.45;
+      if (t < c0 || t >= c1) continue;
+      const out = k + 1 < chunks.length ? 1 : clamp((c1 - t) / 0.12);
+      const words = ch.map((w) => [w.w.toUpperCase(), w]);
+      const size = fitSize(ctx, [words.map(([x]) => [x, WHITE])], SUB_SIZE, 820);
+      ctx.font = `${size}px Anton`;
+      const gap = size * 0.34;
+      const widths = words.map(([x]) => ctx.measureText(x).width);
+      let x = CX - (widths.reduce((a, b) => a + b, 0) + gap * (words.length - 1)) / 2;
+      // chunk entrance: quick slide-up
+      const ce = E.outCubic(clamp((t - c0) / 0.16));
+      words.forEach(([txt, w], i) => {
+        const shown = t >= w.t0 - 0.03;
+        if (shown) {
+          const age = t - (w.t0 - 0.03);
+          const active = t >= w.t0 - 0.03 && t < w.t1;
+          const pop = 0.55 + 0.45 * E.outBackBig(clamp(age / 0.16));
+          const sc = pop * (active ? 1.08 : 1);
+          const col = w.c !== "w" ? SUB_COL[w.c] : active ? YEL : WHITE;
+          ctx.save();
+          ctx.translate(x + widths[i] / 2, SUB_Y + (1 - ce) * 30);
+          ctx.scale(sc, sc);
+          ctx.rotate(active && w.c === "r" ? Math.sin(t * 70) * 0.03 : 0);
+          drawLine(ctx, [[txt, col]], 0, 0, size, out * clamp(age / 0.06), 0.13);
+          ctx.restore();
+        }
+        x += widths[i] + gap;
+      });
+    }
+  }
+}
+
 export function drawOverlay(ctx, t, project) {
   for (const c of caps) caption(ctx, c, t);
+  drawSubs(ctx, t, window.VO || []);
   for (const a of attempts) attemptBadge(ctx, a, t);
   measure(ctx, t, project);
   endCard(ctx, t);

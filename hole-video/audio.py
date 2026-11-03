@@ -517,8 +517,30 @@ rev = np.zeros_like(wet)
 for c in range(2):
     rev[:, c] = np.fft.irfft(np.fft.rfft(wet[:, c], nfft) * np.fft.rfft(ir[:, c], nfft), nfft)[:N]
 
-# duck the music under big hits a little
-mix = dry + rev * 0.55 + music * 0.85
+# voiceover (vo/vo.wav from vo_build.py) with sidechain-style ducking of music + sfx
+import os
+vo = np.zeros((N, 2))
+if os.path.exists("vo/vo.wav"):
+    with wave.open("vo/vo.wav") as w:
+        raw = np.frombuffer(w.readframes(w.getnframes()), dtype=np.int16).reshape(-1, 2) / 32768.0
+    vo[: min(N, len(raw))] = raw[:N]
+    lvl = np.abs(vo[:, 0])
+    k = int(0.12 * SR)
+    lvl = np.convolve(lvl, np.ones(k) / k, mode="same")
+    duck_env = np.clip(lvl / (np.max(lvl) * 0.25 + 1e-9), 0, 1)
+    # smooth release
+    kk = int(0.25 * SR)
+    duck_env = np.convolve(duck_env, np.ones(kk) / kk, mode="same")
+    duck_env = np.clip(duck_env * 1.5, 0, 1)[:, None]
+    # presence: gentle high-shelf-ish boost by mixing in a band-passed copy
+    for c in range(2):
+        vo[:, c] = vo[:, c] + band(vo[:, c], 2000, 6000) * 0.35
+    dry_scale = 1 - 0.35 * duck_env
+    music_scale = 1 - 0.6 * duck_env
+else:
+    dry_scale = music_scale = 1.0
+pre = dry * dry_scale + rev * 0.55 * dry_scale + music * 0.85 * music_scale
+mix = pre + vo * (np.max(np.abs(pre)) * 0.9 / max(1e-9, np.max(np.abs(vo))) if np.any(vo) else 0)
 # gentle bus compression via soft clip
 mix = mix / np.max(np.abs(mix)) * 1.6
 mix = np.tanh(mix) / np.tanh(1.6)
