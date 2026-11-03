@@ -1,0 +1,32 @@
+<!doctype html><html><head><meta charset="utf-8"><style>body{margin:0;background:#000}</style>
+<script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script></head>
+<body><script type="module">
+import * as THREE from "three";
+import { buildCrawler, applyCrawler } from "./src/creature2.js";
+const W=540,H=960;
+const r=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true}); r.setSize(W,H,false);
+r.toneMapping=THREE.ACESFilmicToneMapping; r.toneMappingExposure=1.4; r.shadowMap.enabled=true;
+document.body.appendChild(r.domElement);
+const s=new THREE.Scene(); s.background=new THREE.Color(0x0b0a10);
+const cam=new THREE.PerspectiveCamera(40,W/H,0.05,100);
+s.add(new THREE.HemisphereLight(0x8090b0,0x201510,0.6));
+const key=new THREE.SpotLight(0xffc890,60,12,0.6,0.5,1.5); key.position.set(1.8,2.6,2.2); key.castShadow=true; s.add(key);
+const rim=new THREE.DirectionalLight(0x8ab0ff,1.4); rim.position.set(-2,2,-3); s.add(rim);
+const floor=new THREE.Mesh(new THREE.PlaneGeometry(20,20),new THREE.MeshStandardMaterial({color:0x3a2c22,roughness:0.9})); floor.rotation.x=-Math.PI/2; floor.receiveShadow=true; s.add(floor);
+const c=buildCrawler(s);
+const POSES={
+ crawl:{},
+ stand:{pos:[0,1.12,0],pitch:-0.05,spine:[0.18,0,0],chest:[0.12,0,0],neck:[0.25,0,0],head:[0.05,0,0],hL:[0.38,0.25,0.28],hR:[-0.38,0.25,0.28],fL:[0.17,0.12,0.06],fR:[-0.17,0.12,0.06],curl:0.6,jaw:0.15},
+ lunge:{pos:[0,1.0,0],pitch:0.55,spine:[0.1,0,0],neck:[-0.2,0,0],head:[-0.25,0,0],hL:[0.3,1.25,1.25],hR:[-0.3,1.25,1.25],fL:[0.25,0.12,-0.25],fR:[-0.25,0.12,-0.25],jaw:1,curl:0.1,twitch:0},
+};
+window.renderAt=(t)=>{
+ const mode=t<1?'crawl':t<2?'stand':t<3?'lunge':'lunge';
+ applyCrawler(c,POSES[mode],t*0.37+0.2);
+ const a= t%1*6.28*0+0.6;
+ if(t<3){ cam.position.set(Math.sin(a)*3.2, 1.3, Math.cos(a)*3.2); cam.lookAt(0,0.9,0.2);} 
+ else { c.J.head.updateMatrixWorld(true); const h=new THREE.Vector3(); c.J.head.getWorldPosition(h); h.y+=0.09; const f=new THREE.Vector3(0,0,1).applyQuaternion(c.J.head.getWorldQuaternion(new THREE.Quaternion())); cam.position.copy(h).add(f.multiplyScalar(0.75)).add(new THREE.Vector3(0.12,0.05,0)); cam.lookAt(h); cam.fov=30; cam.updateProjectionMatrix(); }
+ r.render(s,cam);};
+window.grab=(q)=>r.domElement.toDataURL('image/jpeg',q);
+const f=new FontFace("Anton","url(/node_modules/@fontsource/anton/files/anton-latin-400-normal.woff2)"); await f.load();
+window.renderAt(0); window.ready=true;
+</script></body></html>

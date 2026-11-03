@@ -10,6 +10,7 @@ const ort = require("onnxruntime-node");
 const { phonemize } = await import("phonemizer");
 
 const ROOT = path.dirname(new URL(import.meta.url).pathname);
+const VO = process.env.VO_DIR || "vo";
 const SR = 24000;
 
 // Kokoro phoneme vocabulary (hexgrad/Kokoro-82M config.json); 0 = pad
@@ -59,11 +60,11 @@ function writeWav(file, samples) {
   fs.writeFileSync(file, b);
 }
 
-const script = JSON.parse(fs.readFileSync(path.join(ROOT, "vo/script.json"), "utf8"));
+const script = JSON.parse(fs.readFileSync(path.join(ROOT, VO, "script.json"), "utf8"));
 const session = await ort.InferenceSession.create(path.join(ROOT, "models/kokoro-q8.onnx"));
 console.log("inputs:", session.inputNames, "outputs:", session.outputNames);
 const voice = blendVoices(script.voice);
-fs.mkdirSync(path.join(ROOT, "vo/lines"), { recursive: true });
+fs.mkdirSync(path.join(ROOT, VO, "lines"), { recursive: true });
 for (const [i, line] of script.lines.entries()) {
   const ph = await toPhonemes(line.say);
   const ids = [0, ...[...ph].map((c) => VOCAB[c]).filter((x) => x !== undefined), 0];
@@ -76,7 +77,7 @@ for (const [i, line] of script.lines.entries()) {
   };
   const out = await session.run(feeds);
   const wav = out[session.outputNames[0]].data;
-  const f = path.join(ROOT, "vo/lines", String(i).padStart(2, "0") + ".wav");
+  const f = path.join(ROOT, VO, "lines", String(i).padStart(2, "0") + ".wav");
   writeWav(f, wav);
   console.log(f, (wav.length / SR).toFixed(2) + "s", ph);
 }

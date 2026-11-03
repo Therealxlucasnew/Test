@@ -1,0 +1,69 @@
+{
+ "voice": "am_michael:0.55,am_fenrir:0.45",
+ "speed": 1.12,
+ "lines": [
+  {
+   "say": "He escaped the hole..."
+  },
+  {
+   "say": "But it followed him home."
+  },
+  {
+   "say": "That night... he heard scratching."
+  },
+  {
+   "say": "Attempt one: barricade the door!"
+  },
+  {
+   "say": "It didn't need the door."
+  },
+  {
+   "say": "Attempt two: hide under the bed!"
+  },
+  {
+   "say": "Safe... right?"
+  },
+  {
+   "say": "It was already there."
+  },
+  {
+   "say": "Attempt three: get to the car!"
+  },
+  {
+   "say": "Dead battery."
+  },
+  {
+   "say": "RUN!"
+  },
+  {
+   "say": "Then he remembered the tunnel..."
+  },
+  {
+   "say": "It ran from the light."
+  },
+  {
+   "say": "So he made a circle of light."
+  },
+  {
+   "say": "Every lamp. Every lantern. Every flashlight."
+  },
+  {
+   "say": "And then... it came back."
+  },
+  {
+   "say": "It wanted in."
+  },
+  {
+   "say": "But it couldn't cross the light!"
+  },
+  {
+   "say": "He survived the night..."
+  },
+  {
+   "say": "...until the power went out."
+  },
+  {
+   "say": "What should he do in part three? Comment below!"
+  }
+ ]
+}

@@ -12,7 +12,8 @@ import json, os, re, subprocess, sys, wave
 import numpy as np
 
 SR = 48000
-DUR = 42.0
+DUR = float(os.environ.get("DUR", "42.0"))
+VO = os.environ.get("VO_DIR", "vo")
 
 # planned start time of each line (seconds). *word* = red emphasis, _word_ = yellow emphasis
 LINES = [
@@ -40,6 +41,10 @@ LINES = [
     (39.60, "Would YOU have escaped? Comment below!"),
 ]
 NO_SUB = {21}  # the end card already shows this line
+if os.path.exists(os.path.join(VO, "lines.json")):
+    _d = json.load(open(os.path.join(VO, "lines.json")))
+    LINES = [tuple(x) for x in _d["lines"]]
+    NO_SUB = set(_d.get("no_sub", []))
 
 
 def words_of(text):
@@ -111,15 +116,15 @@ def word_times(words, t0, t1):
 
 
 def main():
-    os.makedirs("vo", exist_ok=True)
+    os.makedirs(VO, exist_ok=True)
     src = sys.argv[1] if len(sys.argv) > 1 else None
     track = np.zeros(int(DUR * SR), dtype=np.float32)
     timing = []
-    if src == "lines" or (src is None and os.path.exists("vo/lines/00.wav")):
+    if src == "lines" or (src is None and os.path.exists(os.path.join(VO, "lines/00.wav"))):
         # one file per line (vo/lines/NN.wav, e.g. from tts_kokoro.mjs)
         clips = []
         for i in range(len(LINES)):
-            y = read_audio(f"vo/lines/{i:02d}.wav")
+            y = read_audio(os.path.join(VO, f"lines/{i:02d}.wav"))
             v = np.abs(y) > 0.02 * np.max(np.abs(y))
             a0, a1 = np.argmax(v), len(y) - np.argmax(v[::-1])
             clips.append(y[max(0, a0 - int(0.03 * SR)): min(len(y), a1 + int(0.08 * SR))])
@@ -166,10 +171,10 @@ def main():
                 dur = min(dur, LINES[i + 1][0] - planned - 0.1)
             timing.append({"i": i, "start": planned, "end": planned + dur, "sub": i not in NO_SUB,
                            "words": [{"w": w, "c": c, "t0": a, "t1": b} for (w, c), (a, b) in zip(words, word_times(words, planned, planned + dur))]})
-    json.dump(timing, open("vo/vo_timing.json", "w"), indent=1)
+    json.dump(timing, open(os.path.join(VO, "vo_timing.json"), "w"), indent=1)
     if src:
         st = np.stack([track, track], axis=1)
-        with wave.open("vo/vo.wav", "wb") as w:
+        with wave.open(os.path.join(VO, "vo.wav"), "wb") as w:
             w.setnchannels(2); w.setsampwidth(2); w.setframerate(SR)
             w.writeframes((np.clip(st, -1, 1) * 32767).astype(np.int16).tobytes())
         print("wrote vo/vo.wav")

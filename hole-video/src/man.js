@@ -192,7 +192,7 @@ const _X = new THREE.Vector3(), _Y = new THREE.Vector3(), _Z = new THREE.Vector3
 
 // Solve a 2-bone chain. upper/lower are joint groups; target & pole in world space.
 // bendSign +1 for legs (child rx > 0), -1 for arms.
-function solveIK(upper, lower, L1, L2, target, poleWorldDir, bendSign, weight) {
+export function solveIK(upper, lower, L1, L2, target, poleWorldDir, bendSign, weight) {
   if (weight <= 0) return;
   const parent = upper.parent;
   parent.updateWorldMatrix(true, false);

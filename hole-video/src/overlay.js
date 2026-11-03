@@ -2,9 +2,9 @@
 import { E, clamp } from "./anim.js";
 import { timing } from "./timeline.js";
 
-const YEL = "#ffd60a", RED = "#ff2e3f", WHITE = "#ffffff";
+export const YEL = "#ffd60a", RED = "#ff2e3f", WHITE = "#ffffff";
 const W = 1080, H = 1920;
-const CX = 525; // nudge left of center to stay clear of TikTok's right-side buttons
+export const CX = 525; // nudge left of center to stay clear of TikTok's right-side buttons
 
 // lines: array of lines; each line: array of [text, color]
 const caps = [
@@ -18,7 +18,7 @@ const attempts = [
   { t0: 16.8, t1: 21.15, n: 3, word: "CALL FOR HELP", big: 17.45, fail: 20.7 },
 ];
 
-function measureLine(ctx, line, size) {
+export function measureLine(ctx, line, size) {
   ctx.font = `${size}px Anton`;
   let w = 0;
   for (const [txt] of line) w += ctx.measureText(txt).width;
@@ -26,7 +26,7 @@ function measureLine(ctx, line, size) {
   return w;
 }
 
-function drawLine(ctx, line, x, y, size, alpha = 1, strokeK = 0.11) {
+export function drawLine(ctx, line, x, y, size, alpha = 1, strokeK = 0.11) {
   ctx.font = `${size}px Anton`;
   ctx.textBaseline = "middle";
   ctx.textAlign = "left";
@@ -50,7 +50,7 @@ function drawLine(ctx, line, x, y, size, alpha = 1, strokeK = 0.11) {
   ctx.globalAlpha = 1;
 }
 
-function fitSize(ctx, lines, size, maxW = 860) {
+export function fitSize(ctx, lines, size, maxW = 860) {
   let s = size;
   for (const l of lines) {
     const w = measureLine(ctx, l, s);
@@ -59,7 +59,7 @@ function fitSize(ctx, lines, size, maxW = 860) {
   return s;
 }
 
-function caption(ctx, c, t) {
+export function caption(ctx, c, t) {
   const age = t - c.t0, rem = c.t1 - t;
   if (age < 0 || rem < 0) return;
   const out = clamp(rem / 0.12);
@@ -108,7 +108,7 @@ function caption(ctx, c, t) {
   }
 }
 
-function roundRect(ctx, x, y, w, h, r) {
+export function roundRect(ctx, x, y, w, h, r) {
   ctx.beginPath();
   ctx.moveTo(x + r, y);
   ctx.arcTo(x + w, y, x + w, y + h, r);
@@ -118,7 +118,7 @@ function roundRect(ctx, x, y, w, h, r) {
   ctx.closePath();
 }
 
-function pill(ctx, text, x, y, size, bg, fg, alpha = 1) {
+export function pill(ctx, text, x, y, size, bg, fg, alpha = 1) {
   ctx.font = `${size}px Anton`;
   const w = ctx.measureText(text).width + size * 1.0;
   const h = size * 1.45;
@@ -134,7 +134,7 @@ function pill(ctx, text, x, y, size, bg, fg, alpha = 1) {
   return w;
 }
 
-function attemptBadge(ctx, a, t) {
+export function attemptBadge(ctx, a, t) {
   if (t < a.t0 || t > a.t1) return;
   const age = t - a.t0;
   const out = clamp((a.t1 - t) / 0.15);
@@ -259,7 +259,7 @@ function endCard(ctx, t) {
 // ---- voiceover karaoke captions (timings from vo/vo_timing.json) ----
 const SUB_Y = 1250, SUB_SIZE = 100;
 const SUB_COL = { w: WHITE, y: YEL, r: RED };
-function chunksOf(line) {
+export function chunksOf(line) {
   const out = [];
   let cur = [];
   for (const w of line.words) {
@@ -269,7 +269,7 @@ function chunksOf(line) {
   if (cur.length) out.push(cur);
   return out;
 }
-function drawSubs(ctx, t, vo) {
+export function drawSubs(ctx, t, vo) {
   for (let li = 0; li < vo.length; li++) {
     const line = vo[li];
     const nextStart = li + 1 < vo.length ? vo[li + 1].start - 0.05 : Infinity;

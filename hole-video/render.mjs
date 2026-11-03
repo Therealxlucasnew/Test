@@ -8,7 +8,7 @@ import { createRequire } from "node:module";
 const { chromium } = createRequire(import.meta.url)("playwright");
 
 const ROOT = path.dirname(new URL(import.meta.url).pathname);
-const TYPES = { ".html": "text/html", ".js": "text/javascript", ".woff2": "font/woff2", ".json": "application/json" };
+const TYPES = { ".html": "text/html", ".js": "text/javascript", ".woff2": "font/woff2", ".json": "application/json", ".jpg": "image/jpeg", ".png": "image/png" };
 
 function serve() {
   return new Promise((res) => {
@@ -34,7 +34,9 @@ const page = await browser.newPage({ viewport: { width: 400, height: 700 } });
 page.on("console", (m) => { if (m.type() === "error" || m.type() === "warning") console.log("[page]", m.text()); });
 page.on("pageerror", (e) => console.log("[pageerror]", e.message));
 const scale = mode === "stills" ? parseFloat(b || "0.5") : 1;
-await page.goto(`http://localhost:${port}/index.html?scale=${scale}`);
+const PAGE = process.env.PAGE || "index.html";
+const FRAMES = process.env.FRAMES || "frames";
+await page.goto(`http://localhost:${port}/${PAGE}?scale=${scale}`);
 await page.waitForFunction(() => window.ready === true, null, { timeout: 120000 });
 
 if (process.env.DBG) await page.evaluate(process.env.DBG);
@@ -44,17 +46,17 @@ if (mode === "stills") {
     const t0 = Date.now();
     await page.evaluate((t) => window.renderAt(t), t);
     const url = await page.evaluate(() => window.grab(0.9));
-    const f = path.join(ROOT, "stills", `t_${t.toFixed(2)}.jpg`);
+    const f = path.join(ROOT, "stills", (process.env.PREFIX || "") + `t_${t.toFixed(2)}.jpg`);
     fs.writeFileSync(f, Buffer.from(url.split(",")[1], "base64"));
     console.log(f, Date.now() - t0, "ms");
   }
 } else if (mode === "frames") {
   const fps = parseFloat(c || "30");
   const start = parseInt(a), end = parseInt(b);
-  fs.mkdirSync(path.join(ROOT, "frames"), { recursive: true });
+  fs.mkdirSync(path.join(ROOT, FRAMES), { recursive: true });
   const tStart = Date.now();
   for (let i = start; i < end; i++) {
-    const f = path.join(ROOT, "frames", String(i + 1).padStart(5, "0") + ".jpg");
+    const f = path.join(ROOT, FRAMES, String(i + 1).padStart(5, "0") + ".jpg");
     if (fs.existsSync(f)) continue;
     await page.evaluate((t) => window.renderAt(t), i / fps);
     const url = await page.evaluate(() => window.grab(0.94));

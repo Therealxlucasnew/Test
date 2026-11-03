@@ -484,7 +484,7 @@ export function buildWorld(scene) {
 }
 
 // ---------- particles: dust bursts, falling dirt, floating motes ----------
-export function buildParticles(scene, bursts) {
+export function buildParticles(scene, bursts, moteBox = { x: [-0.7, 0.7], y: [-6, 0], z: [-0.7, 0.7] }) {
   const r = rng(99);
   const parts = [];
   for (const b of bursts) {
@@ -503,7 +503,8 @@ export function buildParticles(scene, bursts) {
   }
   const MOTES = 260;
   const motes = [];
-  for (let i = 0; i < MOTES; i++) motes.push([(r() - 0.5) * 1.4, -r() * 6, (r() - 0.5) * 1.4, r() * 10, 0.02 + r() * 0.03]);
+  const lerpB = (b, u) => b[0] + (b[1] - b[0]) * u;
+  for (let i = 0; i < MOTES; i++) motes.push([lerpB(moteBox.x, r()), lerpB(moteBox.y, r()), lerpB(moteBox.z, r()), r() * 10, 0.02 + r() * 0.03]);
   const count = parts.length + MOTES;
   const geo = new THREE.BufferGeometry();
   const pos = new Float32Array(count * 3), col = new Float32Array(count * 3), alpha = new Float32Array(count), size = new Float32Array(count);
