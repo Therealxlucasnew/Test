@@ -4,3 +4,4 @@ stills/
 models/
 *.wav
 !vo/vo.wav
+out/preview-*.mp4
