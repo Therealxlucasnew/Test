@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>TCAS Explained</title>
+<style>
+  :root { --amber: #ffb000; --red: #ff2d3d; --green: #22e07a; --cyan: #3ee0ff; --white: #fff; --ink: #05070d; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--ink); }
+  body { font-family: "Inter Display", "Inter", sans-serif; color: #fff; }
+  #gl { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+  #ui { position: absolute; inset: 0; overflow: hidden; }
+  #world { position: absolute; inset: 0; }
+  .el { position: absolute; left: 540px; top: 0; transform: translate(-50%, -50%); white-space: nowrap; text-align: center; opacity: 0; }
+  .black { font-weight: 900; letter-spacing: -0.03em; line-height: .92; text-transform: uppercase; }
+  .xbold { font-weight: 800; text-transform: uppercase; letter-spacing: .02em; }
+  .glow { text-shadow: 0 0 30px currentColor, 0 10px 40px rgba(0,0,0,.6); }
+  .shadow { text-shadow: 0 12px 50px rgba(0,0,0,.65); }
+  .pill { padding: 16px 34px; border-radius: 999px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; background: rgba(5,7,13,.6); border: 2px solid rgba(255,255,255,.25); }
+  .hud { font-family: "DejaVu Sans Mono", monospace; font-weight: 700; letter-spacing: .06em; }
+  #captions { position: absolute; left: 130px; right: 130px; top: 1260px; height: 220px; display: flex; flex-wrap: wrap; justify-content: center; align-content: center; gap: 4px 20px; }
+  #captions span { display: inline-block; font-weight: 900; font-size: 68px; text-transform: uppercase; letter-spacing: -0.01em; line-height: 1.05;
+    text-shadow: 0 0 2px #000, 4px 4px 0 #000, -4px 4px 0 #000, 4px -4px 0 #000, -4px -4px 0 #000, 0 6px 0 #000, 0 10px 30px rgba(0,0,0,.8); transform-origin: 50% 70%; }
+  #vignette { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse 90% 70% at 50% 45%, rgba(0,0,0,0) 60%, rgba(0,0,0,.45) 100%); }
+  #alert { position: absolute; inset: 0; pointer-events: none; opacity: 0; }
+  #flash { position: absolute; inset: 0; background: #fff; opacity: 0; }
+  #fade { position: absolute; inset: 0; background: #000; opacity: 0; }
+  #progress { position: absolute; left: 0; top: 0; height: 10px; background: linear-gradient(90deg, var(--cyan), var(--amber), var(--red)); }
+  #bars { position: absolute; inset: 0; pointer-events: none; }
+  .marker { position: absolute; left: 0; top: 0; transform: translate(-50%, -50%); opacity: 0; }
+  .marker .lbl { position: absolute; left: 50%; transform: translateX(-50%); font: 800 38px "DejaVu Sans Mono", monospace; white-space: nowrap; }
+</style>
+<script type="importmap">{ "imports": { "three": "./node_modules/three/build/three.module.js" } }</script>
+</head>
+<body>
+<canvas id="gl" width="1080" height="1920"></canvas>
+<div id="ui">
+  <div id="fade"></div>
+  <div id="alert"></div>
+  <div id="world"><div id="scenes"></div><div id="markers"></div><div id="captions"></div></div>
+  <div id="vignette"></div>
+  <div id="flash"></div>
+  <div id="progress"></div>
+</div>
+<script type="module" src="./main.js"></script>
+</body>
+</html>

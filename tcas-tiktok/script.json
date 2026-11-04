@@ -1,0 +1,14 @@
+[
+  {"id": "hook",   "phrases": ["Two airliners.", "Same altitude.", "Closing at nine hundred knots.", "Head on."]},
+  {"id": "time",   "phrases": ["At this speed,", "you have less than a minute."]},
+  {"id": "tcas",   "phrases": ["What saves them", "is a box you've probably never heard of.", {"say": "Tee-cass.", "show": "TCAS."}]},
+  {"id": "name",   "phrases": ["The Traffic Collision Avoidance System."]},
+  {"id": "ping",   "phrases": ["Every second, it pings the transponder", "of every plane nearby,", "and calculates one number:", "seconds until impact."]},
+  {"id": "ta",     "phrases": ["Forty-eight seconds out,", "the first warning.", {"say": "Traffic. Traffic.", "voice": "am_michael", "speed": 1.0, "fx": "radio", "callout": true}]},
+  {"id": "ra",     "phrases": ["Thirty-five seconds out,", "it takes command.", {"say": "Climb. Climb.", "voice": "am_michael", "speed": 1.0, "fx": "radio", "callout": true}]},
+  {"id": "coord",  "phrases": ["Here's the genius part.", "The two planes talk to each other.", "One is told to climb.", "The other, to descend."]},
+  {"id": "rule",   "phrases": ["And pilots must obey,", "even if air traffic control", "says the opposite."]},
+  {"id": "uber",   "phrases": [{"say": "Because in two thousand two,", "show": "Because in 2002,"}, {"say": "over Uberlingen, Germany,", "show": "over Überlingen, Germany,"}, "one crew followed the controller", {"say": "instead of Tee-cass.", "show": "instead of TCAS."}, {"say": "Seventy-one people died.", "show": "71 people died."}]},
+  {"id": "clear",  "phrases": ["Today, every large airliner carries it.", {"say": "Clear of conflict.", "voice": "am_michael", "speed": 1.0, "fx": "radio", "callout": true}]},
+  {"id": "cta",    "phrases": ["So,", "would you trust the computer,", "or the controller?"]}
+]
